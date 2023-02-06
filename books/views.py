@@ -16,7 +16,7 @@ def display_charts(request):
 def index(request):
     latest_question_list = Purchase.objects
     context = {
-        'latest_question_list': latest_question_list.all(),
+        'latest_question_list': latest_question_list.order_by('time_created')[:2],
     }
     return render(request, 'books/index.html', context)
 
@@ -28,6 +28,7 @@ def detail(request, question_id):
 
 def results(request, question_id):
     question = get_object_or_404(Purchase, pk=question_id)
+
     return render(request, 'books/results.html', {'question': question})
 
 
@@ -83,7 +84,7 @@ def get_annual_sales(request, year):
         'month',
         'average'
     ).order_by('month')
-    sales_dict=get_year_dict()
+    sales_dict = get_year_dict()
     for merge in merged_purchases:
         sales_dict[months[merge['month']-1]]=round(merge['average'], 2)
 

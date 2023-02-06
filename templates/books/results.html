@@ -1,9 +1,12 @@
+<h1>Ваша корзина</h1>
 <h1>{{ question.book }}</h1>
 
 <ul>
     {% for choice in question.choice_set.all %}
-        <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+        <li>{{ choice.choice_text }} -- {{ choice.votes }} выбрано{{ choice.votes|pluralize }}</li>
     {% endfor %}
 </ul>
 
 <a href="{% url 'books:detail' question.id %}">Vote again?</a>
+<a href="{% url 'books:chart' %}">See chart</a>
+<a href="{% url 'books:index' %}">Start again</a>

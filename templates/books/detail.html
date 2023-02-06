@@ -1,3 +1,4 @@
+<h1>Какую книгу хотете приобрести? Стоимость у коллекции одинакова для всех книг</h1>
 <form action="{% url 'books:vote' question.id %}" method="post">
     {% csrf_token %}
     <fieldset>
