@@ -1,14 +1,56 @@
 from django.db.models import Sum, F
 from django.db.models.functions import ExtractYear, ExtractMonth
-from django.shortcuts import render
-from .models import Purchase
-from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
+
+from .models import Purchase, Book, Choice
+from django.http import JsonResponse, HttpResponseRedirect
 # Create your views here.
 from .utils import get_year_dict, months, generate_color_palette
 
 
 def display_charts(request):
     return render(request, 'charts.html', {})
+
+
+def index(request):
+    latest_question_list = Purchase.objects
+    context = {
+        'latest_question_list': latest_question_list.all(),
+    }
+    return render(request, 'books/index.html', context)
+
+
+def detail(request, question_id):
+    question = get_object_or_404(Purchase, pk=question_id)
+    return render(request, 'books/detail.html', {'question': question})
+
+
+def results(request, question_id):
+    question = get_object_or_404(Purchase, pk=question_id)
+    return render(request, 'books/results.html', {'question': question})
+
+
+def vote(request, question_id):
+    question = get_object_or_404(Purchase, pk=question_id)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        return render(request, 'books/detail.html', {
+            'question': question,
+            'error_message': "Вы не сделали выбор."
+        })
+    else:
+        selected_choice.votes += 1
+        Purchase.objects.create(
+            book=question.book,
+            customer=question.customer,
+            payment_method=question.payment_method,
+            time_created=question.time_created,
+            is_successful=question.is_successful
+        )
+        selected_choice.save()
+        return HttpResponseRedirect(reverse('books:results', args=(question.id,)))
 
 
 def filter_options(request):

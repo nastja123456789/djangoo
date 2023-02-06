@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 
@@ -20,7 +21,7 @@ class Purchase(models.Model):
     ]
     customer = models.CharField(max_length=250)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
-    payment_method = models.CharField(max_length=6,choices=PAYMENT_METHODS)
+    payment_method = models.CharField(max_length=6, choices=PAYMENT_METHODS)
     time_created = models.DateTimeField(auto_now_add=True)
     is_successful = models.BooleanField(default=True)
 
@@ -28,3 +29,10 @@ class Purchase(models.Model):
         return str(self.book)
 
 
+class Choice(models.Model):
+    question = models.ForeignKey(Purchase, on_delete=models.DO_NOTHING, )
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.choice_text
