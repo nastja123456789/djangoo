@@ -13,6 +13,30 @@ def display_charts(request):
     return render(request, 'charts.html', {})
 
 
+def ai(request):
+    return render(request, 'ai.html')
+
+import pandas as pd
+import pickle
+model = pickle.load(open('./model/breast_cancer.pkl', 'rb+'))
+
+def predict(request):
+    if request.method == 'POST':
+        temp = {}
+        temp['texture'] = float(request.POST.get('texture'))
+        temp['radius'] = float(request.POST.get('radius'))
+        temp['perimeter'] = float(request.POST.get('perimeter'))
+        temp['smoothness'] = float(request.POST.get('smoothness'))
+        temp['area'] = float(request.POST.get('area'))
+
+        testdata = pd.DataFrame({'x': temp}).transpose()
+        scoreval = model.predict(testdata)[0]
+        if scoreval == 0:
+            ans = "Benign"
+        else:
+            ans = "Malignant"
+        return render(request, 'predict.html', {'result': ans})
+
 def index(request):
     latest_question_list = Purchase.objects
     context = {
